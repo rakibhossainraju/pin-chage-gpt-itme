@@ -136,7 +136,6 @@ class URLTracker {
     window.addEventListener("conversationChanged", ({ detail }) => {
       this.checkUrlChange(detail.url);
     });
-
   }
 
   setupOnChangeCallback(callback) {
@@ -218,7 +217,9 @@ class ChatHistoryUI extends DocumentManager {
       this.storageManager.pinConversation(detail.conversationId, detail.title)
     ) {
       this.addPinnedConversationToUI(detail);
-      if(this.getURL() === detail.conversationId) this.conversationChanged(detail.conversationId);
+      if (this.getURL() === detail.conversationId) {
+        this.conversationChanged(detail.conversationId);
+      }
     }
   };
   handleUnpinConversation = ({ detail }) => {
@@ -226,17 +227,21 @@ class ChatHistoryUI extends DocumentManager {
       this.storageManager.unpinConversation(detail.conversationId)
     ) {
       this.removePinnedConversationFromUI(detail.conversationId);
-      if(this.getURL() === detail.conversationId) this.conversationChanged(detail.conversationId);
+      if (this.getURL() === detail.conversationId) {
+        this.conversationChanged(detail.conversationId);
+      }
     }
-  }
+  };
 
   removePinnedConversationFromUI(conversationId) {
     const pinnedList = this.chatContainer.querySelector(
       "#pinned-conversations-list",
     );
-    const conversationItem = pinnedList.querySelector(`li a[href="${conversationId}"]`);
+    const conversationItem = pinnedList.querySelector(
+      `li a[href="${conversationId}"]`,
+    );
     if (conversationItem) {
-      console.log('COMMING TO REMOVE THE CONVERCATION')
+      console.log("COMMING TO REMOVE THE CONVERCATION");
       conversationItem.remove();
     }
   }
@@ -388,8 +393,10 @@ class ChatHistoryUI extends DocumentManager {
       if (a) a.parentNode.classList.remove("active");
     };
 
-    document.querySelectorAll("#pinned-conversations-list .active").forEach((el) => el.classList.remove("active"));
-    if(this.storageManager.isConversationPinned(url)) {
+    document.querySelectorAll("#pinned-conversations-list .active").forEach((
+      el,
+    ) => el.classList.remove("active"));
+    if (this.storageManager.isConversationPinned(url)) {
       addCLass(url);
     }
   }
