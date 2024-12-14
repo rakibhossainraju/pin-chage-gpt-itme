@@ -68,6 +68,10 @@ class DocumentManager {
       li[data-testid^="history"] > div:has(:hover) .pin-button-tooltip {
         display: block;
       }
+
+      li[data-testid^="history"] a:not([href]) {
+        cursor: pointer;
+      }
     `;
     document.head.appendChild(styleElement);
   }
@@ -236,9 +240,13 @@ class ChatHistoryUI extends DocumentManager {
     }
     conversationText.setAttribute("title", title);
     conversationText.innerHTML = title;
-    conversationLink.setAttribute("href", conversationId);
+
+    conversationLink.removeAttribute("href");
+    conversationLink.setAttribute("chatLink", conversationId);
     conversationLink.setAttribute("data-processed", true);
     conversationLink.setAttribute("data-discover", true);
+    conversationLink.addEventListener("click", this.handleNavigation);
+
     conversationItem.querySelector("span[data-state='closed']").replaceWith(this.createUnpinButton({ title, conversationId }));
 
     pinnedList.appendChild(conversationItem);
@@ -351,11 +359,11 @@ class ChatHistoryUI extends DocumentManager {
 
   conversationChanged(url) {
     const addCLass = (url) => {
-      const a = this.selector(`#pinned-conversations-list a[href="${url}"]`);
+      const a = this.selector(`#pinned-conversations-list a[href="${url}"]`) ?? this.selector(`#pinned-conversations-list a[chatLink="${url}"]`);
       if (a) a.parentNode.classList.add("active");
     };
     const removeClass = (url) => {
-      const a = this.selector(`#pinned-conversations-list a[href="${url}"]`);
+      const a = this.selector(`#pinned-conversations-list a[href="${url}"]`) ?? this.selector(`#pinned-conversations-list a[chatLink="${url}"]`);
       if (a) a.parentNode.classList.remove("active");
     };
 
@@ -372,6 +380,25 @@ class ChatHistoryUI extends DocumentManager {
       this.conversationChanged(url);
     });
   }
+
+  handleNavigation = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const conversationLink = e.target.closest("a");
+    const conversationId = conversationLink.attributes.chatLink.value;
+
+    const allConversationLinks = this.chatContainer.querySelectorAll("a[href]");
+    const originalConversation = Array.from(allConversationLinks).find((link) => link.getAttribute("href") === conversationId);
+
+    if (originalConversation) {
+      originalConversation.click();
+    } else {
+      const conversationLink = document.createElement("a");
+      conversationLink.setAttribute("href", conversationId);
+      conversationLink.click();
+    }
+  };
 }
 
 // Initialize the chat history UI
