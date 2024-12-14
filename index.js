@@ -83,15 +83,11 @@ class ChatHistoryStorage {
   }
 
   savePinnedConversations() {
-    localStorage.setItem(
-      "pinnedConversations",
-      JSON.stringify(this.pinnedConversations)
-    );
+    localStorage.setItem("pinnedConversations", JSON.stringify(this.pinnedConversations));
   }
 
   pinConversation(conversationId, title) {
-    if (!conversationId || !title || this.isConversationPinned(conversationId))
-      return false;
+    if (!conversationId || !title || this.isConversationPinned(conversationId)) return false;
     this.pinnedConversations[conversationId] = title;
     this.savePinnedConversations();
     return true;
@@ -154,9 +150,7 @@ class ChatHistoryUI extends DocumentManager {
   constructor() {
     super();
     this.storageManager = new ChatHistoryStorage();
-    this.chatContainer = this.selector(
-      ".flex-col.flex-1.transition-opacity.duration-500.relative.-mr-2.pr-2.overflow-y-auto"
-    );
+    this.chatContainer = this.selector(".flex-col.flex-1.transition-opacity.duration-500.relative.-mr-2.pr-2.overflow-y-auto");
     this.initialize();
   }
 
@@ -170,10 +164,7 @@ class ChatHistoryUI extends DocumentManager {
   }
 
   setupEventListeners() {
-    this.chatContainer.addEventListener(
-      "mouseover",
-      this.handleConversationHover
-    );
+    this.chatContainer.addEventListener("mouseover", this.handleConversationHover);
     window.addEventListener("pinConversation", this.handlePinConversation);
     window.addEventListener("unpinConversation", this.handleUnpinConversation);
   }
@@ -188,9 +179,7 @@ class ChatHistoryUI extends DocumentManager {
   }
 
   createPinnedSection() {
-    const sidebarPanel = this.chatContainer.querySelector(
-      ".flex.flex-col.gap-2.text-token-text-primary.text-sm.false.mt-5.pb-2"
-    );
+    const sidebarPanel = this.chatContainer.querySelector(".flex.flex-col.gap-2.text-token-text-primary.text-sm.false.mt-5.pb-2");
     if (!sidebarPanel) return;
 
     const pinnedSectionHTML = `
@@ -212,9 +201,7 @@ class ChatHistoryUI extends DocumentManager {
   }
 
   handlePinConversation = ({ detail }) => {
-    if (
-      this.storageManager.pinConversation(detail.conversationId, detail.title)
-    ) {
+    if (this.storageManager.pinConversation(detail.conversationId, detail.title)) {
       this.addPinnedConversationToUI(detail);
       if (this.getURL() === detail.conversationId) {
         this.conversationChanged(detail.conversationId);
@@ -231,12 +218,8 @@ class ChatHistoryUI extends DocumentManager {
   };
 
   removePinnedConversationFromUI(conversationId) {
-    const pinnedList = this.chatContainer.querySelector(
-      "#pinned-conversations-list"
-    );
-    const conversationItem = pinnedList.querySelector(
-      `li a[href="${conversationId}"]`
-    );
+    const pinnedList = this.chatContainer.querySelector("#pinned-conversations-list");
+    const conversationItem = pinnedList.querySelector(`li a[href="${conversationId}"]`);
     if (conversationItem) {
       console.log("COMMING TO REMOVE THE CONVERCATION");
       conversationItem.remove();
@@ -244,9 +227,7 @@ class ChatHistoryUI extends DocumentManager {
   }
 
   addPinnedConversationToUI({ title, conversationId, isActiveConversation }) {
-    const pinnedList = this.chatContainer.querySelector(
-      "#pinned-conversations-list"
-    );
+    const pinnedList = this.chatContainer.querySelector("#pinned-conversations-list");
     const conversationItem = this.cloneElement(this.templateHistoryItem);
     const conversationLink = conversationItem.querySelector("a");
     const conversationText = conversationLink.querySelector("div[title]");
@@ -258,9 +239,7 @@ class ChatHistoryUI extends DocumentManager {
     conversationLink.setAttribute("href", conversationId);
     conversationLink.setAttribute("data-processed", true);
     conversationLink.setAttribute("data-discover", true);
-    conversationItem
-      .querySelector("span[data-state='closed']")
-      .replaceWith(this.createUnpinButton({ title, conversationId }));
+    conversationItem.querySelector("span[data-state='closed']").replaceWith(this.createUnpinButton({ title, conversationId }));
 
     pinnedList.appendChild(conversationItem);
   }
@@ -281,11 +260,7 @@ class ChatHistoryUI extends DocumentManager {
   };
 
   isValidConversationTarget(target) {
-    return (
-      target &&
-      target.getAttribute("data-discover") &&
-      !target.getAttribute("data-processed")
-    );
+    return target && target.getAttribute("data-discover") && !target.getAttribute("data-processed");
   }
 
   getURL() {
@@ -306,10 +281,7 @@ class ChatHistoryUI extends DocumentManager {
     const buttonContainer = this.createElement("div");
     buttonContainer.classList.add("pin-button-tooltip");
     buttonContainer.setAttribute("data-conversation-id", data.conversationId);
-    buttonContainer.setAttribute(
-      "data-conversation-title",
-      data.conversationTitle
-    );
+    buttonContainer.setAttribute("data-conversation-title", data.conversationTitle);
     buttonContainer.addEventListener("click", this.handlePinButtonClick);
     buttonContainer.innerHTML = this.getPinIconSVG();
     return buttonContainer;
@@ -319,10 +291,7 @@ class ChatHistoryUI extends DocumentManager {
     const buttonContainer = this.createElement("div");
     buttonContainer.classList.add("unpin-button-tooltip");
     buttonContainer.setAttribute("data-conversation-id", data.conversationId);
-    buttonContainer.setAttribute(
-      "data-conversation-title",
-      data.conversationTitle
-    );
+    buttonContainer.setAttribute("data-conversation-title", data.conversationTitle);
     buttonContainer.addEventListener("click", this.handleUnpinButtonClick);
     buttonContainer.innerHTML = this.getUnpinIconSVG();
     return buttonContainer;
@@ -390,9 +359,7 @@ class ChatHistoryUI extends DocumentManager {
       if (a) a.parentNode.classList.remove("active");
     };
 
-    document
-      .querySelectorAll("#pinned-conversations-list .active")
-      .forEach((el) => el.classList.remove("active"));
+    document.querySelectorAll("#pinned-conversations-list .active").forEach((el) => el.classList.remove("active"));
     if (this.storageManager.isConversationPinned(url)) {
       addCLass(url);
     }
