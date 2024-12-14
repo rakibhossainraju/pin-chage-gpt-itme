@@ -223,9 +223,8 @@ class ChatHistoryUI extends DocumentManager {
 
   removePinnedConversationFromUI(conversationId) {
     const pinnedList = this.chatContainer.querySelector("#pinned-conversations-list");
-    const conversationItem = pinnedList.querySelector(`li a[href="${conversationId}"]`);
+    const conversationItem = pinnedList.querySelector(`li:has(a[chatLink="${conversationId}"])`);
     if (conversationItem) {
-      console.log("COMMING TO REMOVE THE CONVERCATION");
       conversationItem.remove();
     }
   }
